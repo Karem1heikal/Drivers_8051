@@ -1,0 +1,72 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              04/08/2024 16:04:04 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <reg51.h>
+   2          #include "LIB/STD_TYPES.h"
+   3          
+   4          #define DAC_PORT  P2
+   5          
+   6          void DACInit();
+   7          u8 sin_index=0;
+   8          
+   9          code u8 arr[]={128,176,218,245,255,218,176,128,79,37,10,0,10,37,79};
+  10          u8 sd = sizeof(arr)/sizeof(arr[0]);
+  11          
+  12          void timer0_ISR() interrupt 1
+  13          {
+  14   1        DAC_PORT = arr[sin_index];
+  15   1        sin_index++;
+  16   1        if(sin_index<sd)
+  17   1        {
+  18   2          sin_index=0;
+  19   2        }
+  20   1      }
+  21          
+  22          void Timer0Init();
+  23          void main()
+  24          {
+  25   1        DACInit();
+  26   1        Timer0Init();
+  27   1        
+  28   1        while(1);
+  29   1      }
+  30          void DACInit()
+  31          {
+  32   1        DAC_PORT = 00;
+  33   1      }
+  34          
+  35          void Timer0Init()
+  36          {
+  37   1        TMOD = (TMOD &0XF0)|2;
+  38   1        
+  39   1        TH0 = 0XA4;
+  40   1        
+  41   1        TH0 = 0XA4;
+  42   1        
+  43   1        TR0 = 1;
+  44   1         
+  45   1        IE = 0X82;
+  46   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     69    ----
+   CONSTANT SIZE    =     15    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+C51 COMPILER V9.60.7.0   MAIN                                                              04/08/2024 16:04:04 PAGE 2   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

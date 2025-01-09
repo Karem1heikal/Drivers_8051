@@ -1,0 +1,242 @@
+A51 MACRO ASSEMBLER  ADC_INTER                                                            03/04/2024 21:29:54 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\ADC_inter.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE ADC_inter.asm SET(SMALL) DEBUG PRINT(.\Listings\ADC_inter.lst) OBJECT(.
+                      \Objects\ADC_inter.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+0000                   1     org 00h
+0000 020003            2             LJMP MAIN
+0003                   3             MAIN:
+                       4             ;=======================================================================
+  0090                 5             LCD_PORT EQU P1
+  00A0                 6             RS BIT P2.0
+  00A1                 7             E BIT P2.1
+0003 759000            8             MOV LCD_PORT , #00H
+0006 C2A0              9             CLR RS
+0008 C2A1             10             CLR E
+                      11             
+000A 1133             12             ACALL LCD_INIT
+                      13             
+  00B0                14             ADC_PORT EQU P3
+                      15                     
+000C 75B0FF           16             MOV ADC_PORT,#0FFH
+                      17             
+  00A4                18             ALE BIT P2.4
+  00A7                19             OE BIT P2.7
+  00A5                20             START BIT P2.5
+  00A6                21             EOC BIT P2.6
+  00A1                22             AD1     BIT P2.1
+  00A2                23             AD2 BIT P2.2
+  00A3                24             AD3 BIT P2.3
+000F D2A6             25             SETB EOC
+0011 C2A4             26             CLR ALE
+0013 C2A7             27             CLR OE
+0015 C2A5             28             CLR START
+0017                  29             SUPER:
+0017 C2A1             30             clr AD1
+0019 C2A2             31             clr AD2
+001B C2A3             32             clr AD3
+001D D2A4             33             SETB ALE
+001F D2A5             34             SETB START
+0021 C2A4             35             CLR ALE
+0023 C2A5             36             CLR START
+0025 20A6FD           37             JB EOC,$
+0028 30A6FD           38             JNB EOC,$
+002B D2A7             39             SETB OE
+002D E5B0             40             MOV A,ADC_PORT
+002F C2A7             41             CLR OE
+0031 80E4             42             SJMP SUPER
+                      43             
+                      44             
+                      45             ; ADC 0804
+                      46             ;INTR BIT P2.7
+                      47             ;WRR BIT P2.6
+                      48             ;RDD BIT P2.5
+                      49     
+                      50             ;MOV DPTR,#TEMP_MSG
+                      51             ;ACALL LCD_STRING
+                      52             ;SUPER:
+                      53             ;CLR WRR
+                      54             ;SETB WRR
+                      55             ;HERE : JB INTR , HERE
+                      56             ;CLR RDD
+                      57             ;MOV A,P3
+A51 MACRO ASSEMBLER  ADC_INTER                                                            03/04/2024 21:29:54 PAGE     2
+
+                      58             ;MOV R1,A
+                      59             ;MOV A,#0C0H
+                      60             ;ACALL LCD_COMM
+                      61             ;MOV A,R1
+                      62             ;ACALL LCD_NUM
+                      63             ;MOV A,#0DFH
+                      64             ;ACALL LCD_DATA
+                      65             ;MOV A,#'C'
+                      66             ;ACALL LCD_DATA
+                      67             ;ACALL DELAY
+                      68             ;SETB RDD
+                      69             ;SJMP SUPER
+                      70             ; ADC 0808
+                      71             
+                      72             ;=============================================================LCD_DISPLAY_RESULT===
+                             ====================================================================;        
+0033                  73     LCD_INIT:
+0033 7401             74             MOV A , #01H
+0035 118E             75             ACALL LCD_COMM
+0037 7438             76             MOV A , #38H
+0039 118E             77             ACALL LCD_COMM
+003B 740E             78             MOV A , #0EH
+003D 118E             79             ACALL LCD_COMM
+003F 22               80             RET
+0040                  81     LCD_STRING:     
+0040                  82             AGAIN_STRING:
+0040 E4               83              CLR A
+0041 93               84                  MOVC A,@ A+DPTR
+0042 6005             85                  JZ END_STRING
+0044 119C             86                  ACALL LCD_DATA
+0046 A3               87                  INC DPTR
+0047 80F7             88                  SJMP AGAIN_STRING
+0049                  89             END_STRING:
+0049 22               90     RET
+004A                  91     LCD_NUM: 
+004A B40A02           92                 CJNE A ,#10, NOT_EQ1
+004D 800F             93                     SJMP RESULT_2_DIGITS
+004F                  94     NOT_EQ1:
+004F 5006             95             JNC NEXT1
+                      96                     
+0051                  97     RESULT_1_DIGITS:        
+0051 4430             98             ORL A ,#30H
+0053 119C             99                     ACALL LCD_DATA
+0055 8036            100                     SJMP EXT
+0057                 101     NEXT1:  
+0057 B46402          102             CJNE A ,#100, NOT_EQ2
+005A 8019            103                 SJMP RESULT_3_DIGITS
+005C                 104     NOT_EQ2:
+005C 5010            105                 JNC NEXT2
+005E                 106     RESULT_2_DIGITS:                
+005E 75F00A          107                 MOV B ,#10
+0061 84              108                 DIV AB
+0062 4430            109                     ORL A ,#30H
+0064 119C            110                     ACALL LCD_DATA
+0066 E5F0            111                     MOV A ,B
+0068 4430            112                     ORL A ,#30H
+006A 119C            113                     ACALL LCD_DATA
+006C 801F            114                 SJMP EXT
+                     115                     
+                     116             
+006E                 117     NEXT2:
+006E B4FF02          118            CJNE A ,#255, NOT_EQ3
+0071 8002            119             SJMP RESULT_3_DIGITS
+0073                 120     NOT_EQ3:
+0073 5018            121                JNC EXT
+0075                 122     RESULT_3_DIGITS:
+A51 MACRO ASSEMBLER  ADC_INTER                                                            03/04/2024 21:29:54 PAGE     3
+
+0075 75F064          123            MOV B ,#100
+0078 84              124                DIV AB
+0079 4430            125                ORL A ,#30H
+007B 119C            126                ACALL LCD_DATA
+007D E5F0            127                MOV A ,B
+007F 75F00A          128                MOV B ,#10
+0082 84              129                DIV AB
+0083 4430            130                ORL A ,#30H
+0085 119C            131                ACALL LCD_DATA
+0087 E5F0            132                MOV A ,B
+0089 4430            133                ORL A ,#30H
+008B 119C            134                ACALL LCD_DATA
+                     135                
+008D 22              136     EXT:   RET
+                     137             
+008E                 138     LCD_COMM:
+008E F590            139                MOV LCD_PORT , A
+0090 C2A0            140                CLR RS
+0092 D2A1            141                SETB E
+0094 00              142                NOP
+0095 00              143                NOP
+0096 00              144                NOP
+0097 C2A1            145                CLR E
+0099 11AF            146                ACALL DELAY
+009B 22              147                RET
+                     148             
+009C                 149     LCD_DATA:
+009C F590            150             MOV LCD_PORT , A
+009E D2A0            151             SETB RS
+00A0 D2A1            152             SETB E
+00A2 00              153             NOP
+00A3 00              154             NOP
+00A4 00              155             NOP
+00A5 C2A1            156             CLR E
+00A7 11AF            157             ACALL DELAY
+00A9 22              158             RET
+                     159             
+00AA                 160     LCD_CLEAR:
+00AA 7401            161             MOV A , #01H
+00AC 118E            162             ACALL LCD_COMM
+00AE 22              163             RET
+                     164             
+00AF                 165             DELAY:
+00AF 7D50            166             MOV R5 , #50H
+00B1 7EFF            167             LL1: MOV R6 , #0FFH
+00B3 DEFE            168             LL2: DJNZ R6 , LL2
+00B5 DDFA            169             DJNZ R5 , LL1
+00B7 22              170             RET
+0500                 171             ORG 500H
+0500 54454D50        172                     TEMP_MSG: DB "TEMP : ",0
+0504 203A2000                
+                     173             
+                     174     END
+A51 MACRO ASSEMBLER  ADC_INTER                                                            03/04/2024 21:29:54 PAGE     4
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+AD1. . . . . . . .  B ADDR   00A0H.1 A   
+AD2. . . . . . . .  B ADDR   00A0H.2 A   
+AD3. . . . . . . .  B ADDR   00A0H.3 A   
+ADC_PORT . . . . .  D ADDR   00B0H   A   
+AGAIN_STRING . . .  C ADDR   0040H   A   
+ALE. . . . . . . .  B ADDR   00A0H.4 A   
+B. . . . . . . . .  D ADDR   00F0H   A   
+DELAY. . . . . . .  C ADDR   00AFH   A   
+E. . . . . . . . .  B ADDR   00A0H.1 A   
+END_STRING . . . .  C ADDR   0049H   A   
+EOC. . . . . . . .  B ADDR   00A0H.6 A   
+EXT. . . . . . . .  C ADDR   008DH   A   
+LCD_CLEAR. . . . .  C ADDR   00AAH   A   
+LCD_COMM . . . . .  C ADDR   008EH   A   
+LCD_DATA . . . . .  C ADDR   009CH   A   
+LCD_INIT . . . . .  C ADDR   0033H   A   
+LCD_NUM. . . . . .  C ADDR   004AH   A   
+LCD_PORT . . . . .  D ADDR   0090H   A   
+LCD_STRING . . . .  C ADDR   0040H   A   
+LL1. . . . . . . .  C ADDR   00B1H   A   
+LL2. . . . . . . .  C ADDR   00B3H   A   
+MAIN . . . . . . .  C ADDR   0003H   A   
+NEXT1. . . . . . .  C ADDR   0057H   A   
+NEXT2. . . . . . .  C ADDR   006EH   A   
+NOT_EQ1. . . . . .  C ADDR   004FH   A   
+NOT_EQ2. . . . . .  C ADDR   005CH   A   
+NOT_EQ3. . . . . .  C ADDR   0073H   A   
+OE . . . . . . . .  B ADDR   00A0H.7 A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+RESULT_1_DIGITS. .  C ADDR   0051H   A   
+RESULT_2_DIGITS. .  C ADDR   005EH   A   
+RESULT_3_DIGITS. .  C ADDR   0075H   A   
+RS . . . . . . . .  B ADDR   00A0H.0 A   
+START. . . . . . .  B ADDR   00A0H.5 A   
+SUPER. . . . . . .  C ADDR   0017H   A   
+TEMP_MSG . . . . .  C ADDR   0500H   A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  0 WARNING(S), 0 ERROR(S)

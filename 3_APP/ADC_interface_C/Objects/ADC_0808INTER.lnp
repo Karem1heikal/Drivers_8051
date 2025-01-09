@@ -1,0 +1,5 @@
+".\Objects\ADC_program.obj",
+".\Objects\main.obj",
+".\Objects\LCD_program.obj" 
+TO ".\Objects\ADC_0808INTER" 
+PRINT(".\Listings\ADC_0808INTER.m51")
