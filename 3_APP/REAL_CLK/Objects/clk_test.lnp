@@ -1,0 +1,4 @@
+".\Objects\STARTUP.obj",
+".\Objects\clk_test.obj" 
+TO ".\Objects\clk_test" 
+PRINT(".\Listings\clk_test.m51")

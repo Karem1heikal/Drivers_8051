@@ -1,0 +1,77 @@
+A51 MACRO ASSEMBLER  CLK_TEST                                                             01/27/2024 14:00:03 PAGE     1
+
+
+MACRO ASSEMBLER A51 V8.2.7.0
+OBJECT MODULE PLACED IN .\Objects\clk_test.obj
+ASSEMBLER INVOKED BY: C:\Keil_v5\C51\BIN\A51.EXE clk_test.asm SET(SMALL) DEBUG PRINT(.\Listings\clk_test.lst) OBJECT(.\O
+                      bjects\clk_test.obj) EP
+
+LOC  OBJ            LINE     SOURCE
+
+                       1     ;=======================================================================
+  0090                 2             LCD_PORT EQU P1
+  00A0                 3             RS BIT P2.0
+  00A1                 4             E BIT P2.1
+0000 759000            5             MOV LCD_PORT , #00H
+0003 C2A0              6             CLR RS
+0005 C2A1              7             CLR E
+                       8             
+  00A4                 9             RIGHT BIT P2.4
+  00A5                10             LEFT BIT P2.5
+  00A6                11             UP BIT P2.6
+  00A7                12             DOWN BIT P2.7
+  00B2                13             RESET BIT P3.2
+  00B3                14             START BIT P3.3
+0007 D2A4             15             SETB RIGHT
+0009 D2A5             16             SETB LEFT
+000B D2A6             17             SETB UP
+000D D2A7             18             SETB DOWN 
+000F D2B2             19             SETB RESET
+0011 D2B3             20             SETB START
+                      21             
+0013 C281             22             CLR P0.1
+0015                  23             HERE:
+0015 B281             24             CPL P0.1
+0017 111B             25             ACALL DELAY_1mS
+0019 80FA             26             SJMP HERE
+001B                  27             DELAY_1mS:
+001B 7D0E             28             MOV R5 , #14
+001D 7EFA             29             L1:MOV R6 , #250
+001F 7FFA             30             L2: MOV R7 , #250
+0021 DFFE             31             L3: DJNZ R7 , L3
+0023 DEFA             32                     DJNZ R6 , L2
+0025 DDF6             33                     DJNZ R5 , L1
+0027 22               34             RET
+*** WARNING #A41 IN 34 (clk_test.asm, LINE 34): MISSING 'END' STATEMENT
+A51 MACRO ASSEMBLER  CLK_TEST                                                             01/27/2024 14:00:03 PAGE     2
+
+SYMBOL TABLE LISTING
+------ ----- -------
+
+
+N A M E             T Y P E  V A L U E   ATTRIBUTES
+
+DELAY_1MS. . . . .  C ADDR   001BH   A   
+DOWN . . . . . . .  B ADDR   00A0H.7 A   
+E. . . . . . . . .  B ADDR   00A0H.1 A   
+HERE . . . . . . .  C ADDR   0015H   A   
+L1 . . . . . . . .  C ADDR   001DH   A   
+L2 . . . . . . . .  C ADDR   001FH   A   
+L3 . . . . . . . .  C ADDR   0021H   A   
+LCD_PORT . . . . .  D ADDR   0090H   A   
+LEFT . . . . . . .  B ADDR   00A0H.5 A   
+P0 . . . . . . . .  D ADDR   0080H   A   
+P1 . . . . . . . .  D ADDR   0090H   A   
+P2 . . . . . . . .  D ADDR   00A0H   A   
+P3 . . . . . . . .  D ADDR   00B0H   A   
+RESET. . . . . . .  B ADDR   00B0H.2 A   
+RIGHT. . . . . . .  B ADDR   00A0H.4 A   
+RS . . . . . . . .  B ADDR   00A0H.0 A   
+START. . . . . . .  B ADDR   00B0H.3 A   
+UP . . . . . . . .  B ADDR   00A0H.6 A   
+
+
+REGISTER BANK(S) USED: 0 
+
+
+ASSEMBLY COMPLETE.  1 WARNING(S), 0 ERROR(S)
