@@ -1,0 +1,112 @@
+C51 COMPILER V9.60.7.0   PROGRAM                                                           01/19/2025 11:29:34 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE PROGRAM
+OBJECT MODULE PLACED IN .\Objects\program.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE program.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\p
+                    -rogram.lst) OBJECT(.\Objects\program.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include <stdlib.h>
+   3          #include "config.h"
+   4          #include "UART.h"
+   5          #include "program.h"
+   6          
+   7          // Optimized Modular Exponentiation: (base^exp) % mod
+   8          long int modExp(unsigned long int base, unsigned int exp, unsigned int mod) {
+   9   1          long int result = 1;
+  10   1          base = base % mod;
+  11   1      
+  12   1          while (exp > 0) {
+  13   2              if (exp & 1) { // If exp is odd
+  14   3                  result = ((long)result * base) % mod;
+  15   3              }
+  16   2              exp = exp >> 1; // Divide exp by 2
+  17   2              base = ((long)base * base) % mod; // Square the base
+  18   2          }
+  19   1              
+  20   1              while (result < 0) result += mod;
+  21   1              while (result >= mod) result -= mod;
+  22   1      
+  23   1          return result;
+  24   1      }
+  25          
+  26          // Compute GCD (Greatest Common Divisor)
+  27          unsigned int gcd(unsigned int a, unsigned int b) {
+  28   1          while (b != 0) {
+  29   2              unsigned int temp = b;
+  30   2              b = a % b;
+  31   2              a = temp;
+  32   2          }
+  33   1          return a;
+  34   1      }
+  35          
+  36          // Compute Modular Inverse using Extended Euclidean Algorithm
+  37          unsigned int modInverse(unsigned int a, unsigned int m) {
+  38   1          unsigned int m0 = m, t, q;
+  39   1          unsigned int x0 = 0;
+  40   1              int x1 = 1;
+  41   1      
+  42   1          if (m == 1) return 0;
+  43   1      
+  44   1          while (a > 1) {
+  45   2              q = a / m;
+  46   2              t = m;
+  47   2              m = a % m;
+  48   2              a = t;
+  49   2              t = x0;
+  50   2              x0 = x1 - q * x0;
+  51   2              x1 = t;
+  52   2          }
+  53   1      
+  54   1          while (x1 < 0) x1 += m0;
+C51 COMPILER V9.60.7.0   PROGRAM                                                           01/19/2025 11:29:34 PAGE 2   
+
+  55   1              
+  56   1              while (x1 >= m0) x1 -= m0;
+  57   1      
+  58   1          return x1;
+  59   1      }
+  60          
+  61          // Fermat's Primality Test
+  62          unsigned char isPrime(unsigned int n) {
+  63   1              unsigned int i;
+  64   1          if (n <= 1) return 0;
+  65   1          if (n <= 3) return 1;
+  66   1          if (n % 2 == 0 || n % 3 == 0) return 0;
+  67   1      
+  68   1          for (i = 0; i < SECURITY_LEVEL; i++) {
+  69   2              unsigned int a = (rand() % (n - 4)) + 2;
+  70   2              if (modExp(a, n - 1, n) != 1) return 0;
+  71   2          }
+  72   1          return 1;
+  73   1      }
+  74          
+  75          // Generate RSA Keys
+  76          void generateKeys(unsigned int *e, unsigned int *d, unsigned int *phi) {
+  77   1          *e = 3;
+  78   1          while (gcd(*e, *phi) != 1 && *e < *phi) {
+  79   2              (*e)++;
+  80   2          }
+  81   1              if(*e >= *phi) {
+  82   2                      UART_SendString("e can't be calculated\r\n");
+  83   2              }
+  84   1          *d = modInverse(*e, *phi);
+  85   1          //return 0;
+  86   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    764    ----
+   CONSTANT SIZE    =     24    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      39
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
